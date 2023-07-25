@@ -12,8 +12,10 @@ class DB:
     table_admin     = "admin"
     table_help      = "help"
     table_url       = "url"
+    table_now       = "now"
 
     type_id         = "id"
+    type_url        = "url"
     type_email      = "email"
     type_name       = "name"
     type_server     = "server"
@@ -23,7 +25,7 @@ class DB:
         DB._db      = DB.m_db.cursor()
 
 class Email:
-    istype      = None
+    istype      = None      #是水费还是电费
     #admin
     smtp_server = ""
     smtp_port   = 25
@@ -32,6 +34,7 @@ class Email:
 
     #所有收件人
     receiver_email  = []
+    now         = None  #当前要通知的缴费人员的ID
 
     #info
     now_email   = None
@@ -57,15 +60,17 @@ class Check_Time:
 class Cmd:
     _ADD         = 0
     _ADMIN       = 1
-    _REMOVE      = 2
-    _EDIT        = 3
-    _EADMIN      = 4
-    _SELECT      = 5
-    _GETALL      = 6
-    _GETADMIN    = 7
-    _GETBILL     = 8
-    _QUIT        = 9
-    _HELP        = 10
+    _SETNOW      = 2
+    _SETURL      = 3
+    _EDIT        = 4
+    _EADMIN      = 5
+    _REMOVE      = 6
+    _SELECT      = 7
+    _GETALL      = 8
+    _GETADMIN    = 9
+    _GETBILL     = 10
+    _QUIT        = 11
+    _HELP        = 12
 
 class Index:
     _ID          = 0
