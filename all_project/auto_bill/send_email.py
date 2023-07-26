@@ -1,11 +1,16 @@
 #! /usr/bin/python3
 
+import re
+import os
+import requests
 import smtplib
+from bs4 import BeautifulSoup
 
 from bill_class import DB
 from bill_class import Email
 from bill_class import Index
 
+IS_PING = 0
 
 def istype(_val):
     if _val == 0:
@@ -17,6 +22,31 @@ def istype(_val):
             return Email.water_success_text
         return Email.electricity_success_text
     
+#/**********************费用余额*********************/
+#获取水费电费余额
+#默认为获取电费, 0为获取水费
+def get_balanc(url, ele_water = 1):
+	#获取html
+	res = requests.get(url)
+	res.encoding = 'utf_8'
+
+	if IS_PING:	print(type(res))
+
+	#解析?
+	bs1 = BeautifulSoup(res.text,'html.parser')
+
+	html_all = bs1.find_all('script', type='text/javascript')
+
+	#通过正则表达式获取当前电表费用
+	balanc = re.search('"value":(.*?),', str(html_all[1].string))
+
+	if ele_water:
+		m_ele_balanc = balanc.group()
+	else:
+		m_water_balanc = balanc.group()
+	if IS_PING:	print(balanc.group())
+        
+
 def send_all(_smtpObj):
     _res = DB._db.execute(f"SELECT *FROM {DB.table_user} WHELE {DB.type_email} = {Email.now_email};")
     _result = list(_res)

@@ -13,6 +13,7 @@ import create
 import send_email
 from bill_class import DB
 from bill_class import Cmd
+from bill_class import Index
 from bill_class import Check_Time
 
 
@@ -78,6 +79,27 @@ def add_user(_list, _is_special):
             DB._db.execute(_cmd)
             result(DB.table_admin, _list[1])
     print("用户已添加")
+
+def setnow(_list):
+    _result = DB._db.execute(f"SELECT *FROM {DB.table_user} WHERE {DB.type_id} = {_list[1]};")
+    _res = list(chain.from_iterable(list(_result)))
+
+    if len(_res) == 0:
+        print(f"没有ID为::{_list[1]} 的用户")
+        return
+
+    DB._db.execute(f"INSERT INTO {DB.table_now} VALUES({_res[Index._ID]});")
+    DB.m_db.commit()
+    print(f"now = {_res[Index._ID]} 设置成功")
+
+def seturl(_list):
+    if not (_list[1] == "water" and _list[1] == "electricity"):
+        print("name 错误 水费为:water 电费为:electricity")
+        return
+    DB._db.execute(f"UPDATE {DB.table_url} SET {DB.type_url} = '{_list[2]}' WHERE {DB.type_name} = '{_list[1]}';")
+    DB.m_db.commit()
+    print(f"name = {_list[1]} url = {_list[2]} 修改成功")
+
 
 def remove_user(_list):
     if not check_email(DB.table_user,_list[1]):
@@ -163,7 +185,8 @@ def help(_dic = None):
     for _str in _result:
         _case_list = _str[1].split('|')
         if not _dic == None:
-            _dic[_case_list[0]] = i
+            _dic[_case_list[0]] = i   #ID key
+            # _dic[i] = _case_list[0]     # name key
             i+=1
         print(_mat.format(_case_list[0], _case_list[1], _case_list[2]))
         # print("{0:<10}\t{1:<10}\t{2:<10}" .format(_case_list[0], _case_list[1], _case_list[2]))
@@ -187,6 +210,16 @@ def execute_cmd(_dic, _list):
             add_user(_list, 1)
         else:
             print("参数错误，请重试")
+    elif _val == Cmd._SETNOW:
+        if _len == 2:
+            setnow(_list)
+        else:
+            print("参数错误,请重试")
+    elif _val == Cmd._SETURL:
+        if _len == 3:
+            seturl(_list)
+        else:
+            print("参数错误,请重试")
     elif _val == Cmd._REMOVE:
         if _len == 3:
             remove_user(_list)
@@ -248,7 +281,7 @@ def reply_thread(_temp):
     while True:
         _case_list.clear()
         _cmd = input("请输入：")
-        _cmd.strip()
+        _cmd = _cmd.strip()
         # _case_list.append(_cmd.split(' '))    #append是把返回的列表添加到列表里面，所以它的type是list[list[]] 而不是 list["str"]
         _case_list = _cmd.split(' ')
         execute_cmd(_dic, _case_list)
