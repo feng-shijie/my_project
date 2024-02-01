@@ -100,6 +100,8 @@ def add_email(_usr):
 def delete_email(_usr):
 	#if !email.remove(_usr):
 		if IS_PING:	print("not ", _usr)
+#上面是从文本获取数据，以优化为从数据库获取
+
 
 #/**********************费用余额*********************/
 #获取水费电费余额

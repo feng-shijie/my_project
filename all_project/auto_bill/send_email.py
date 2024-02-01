@@ -13,12 +13,13 @@ from bill_class import Index
 IS_PING = 0
 
 def istype(_val):
+    #判断发送给当前人，还是所有人
     if _val == 0:
-        if Email.istype == 0:
+        if Email.istype == False:
             return Email.water_text
         return Email.electricity_text
     else:
-        if Email.istype == 0:
+        if Email.istype == False:
             return Email.water_success_text
         return Email.electricity_success_text
     
@@ -26,25 +27,27 @@ def istype(_val):
 #获取水费电费余额
 #默认为获取电费, 0为获取水费
 def get_balanc(url, ele_water = 1):
-	#获取html
-	res = requests.get(url)
-	res.encoding = 'utf_8'
+    #获取html
+    res = requests.get(url)
+    res.encoding = 'utf_8'
 
-	if IS_PING:	print(type(res))
+    if IS_PING:	print(type(res))
 
-	#解析?
-	bs1 = BeautifulSoup(res.text,'html.parser')
+    #解析?
+    bs1 = BeautifulSoup(res.text,'html.parser')
 
-	html_all = bs1.find_all('script', type='text/javascript')
+    html_all = bs1.find_all('script', type='text/javascript')
 
-	#通过正则表达式获取当前电表费用
-	balanc = re.search('"value":(.*?),', str(html_all[1].string))
+    #通过正则表达式获取当前电表费用
+    balanc = re.search('"value":(.*?),', str(html_all[1].string))
 
-	if ele_water:
-		m_ele_balanc = balanc.group()
-	else:
-		m_water_balanc = balanc.group()
-	if IS_PING:	print(balanc.group())
+    if IS_PING:	print(balanc.group())
+
+    if ele_water:
+        m_ele_balanc = balanc.group()
+        return m_ele_balanc
+    m_water_balanc = balanc.group()
+    return m_water_balanc
         
 
 def send_all(_smtpObj):
@@ -80,7 +83,7 @@ def send_now(_smtpObj):
     _smtpObj.sendmail(Email.sender_email, Email.receiver_email, message)
 
 
-if __name__ == '__main__':
+def start():
     DB.init()
     _res = DB._db.execute(f"SELECT *FROM {DB.table_admin};")
     if not len(list(_res)):

@@ -25,32 +25,38 @@ class DB:
         DB._db      = DB.m_db.cursor()
 
 class Email:
-    istype      = None      #是水费还是电费
+    istype          = None      #是水费还是电费
+    water           = False
+    electricity     = True
+
+    minimum_amount  = 10
     #admin
-    smtp_server = ""
-    smtp_port   = 25
+    smtp_server     = ""
+    smtp_port       = 25
     sender_email    = ""
     sender_password = ""
 
     #所有收件人
+    now             = None  #当前要通知的缴费人员的ID
     receiver_email  = []
-    now         = None  #当前要通知的缴费人员的ID
 
     #info
-    now_email   = None
-    balance     = None
-    subject     = "!!!账单!!!"
-    body        = "请及时缴费"
-    water_text       = "水费不足 10元"
-    electricity_text = "电费不足 10元"
+    now_email        = None
+    subject          = "!!!账单!!!"
+    body             = "请及时缴费"
+    water_text       = f"水费不足 {minimum_amount}元"
+    electricity_text = f"电费不足 {minimum_amount}元"
 
     subject_success     = "!!!恭喜!!!"
     body_success        = "余额为：： "
     water_success_text       = " 水费充值成功"
     electricity_success_text = " 电费充值成功"
 
-class Network:
-    start = None
+    balance_water           = None
+    balance_electricity     = None
+
+class Check_Network:
+    NetWork_start = True
 
 class Check_Time:
     m_morning       = 10
