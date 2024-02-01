@@ -14,16 +14,26 @@ import send_email
 from bill_class import DB
 from bill_class import Cmd
 from bill_class import Index
+from bill_class import Email
 from bill_class import Check_Time
 
 
 # #/*****************检查线程*****************/
 def check_thread():
+    while True:
+        _res = os.system("ping -c 1 www.baidu.com")
+        if _res == 1:
+            break
+        time.sleep(60)
+        
 # #获取账单低于10元发送email
-    _res = os.system("ping -c 1 www.baidu.com")
-    if _res == 1:
-        send_email
-
+    Email.balance_water = send_email.get_balanc(Email.m_water)
+    Email.balance_electricity = send_email.get_balanc(Email.m_electricity)
+    if Email.balance_electricity< Email.minimum_amount or Email.balance_water < Email.minimum_amount:
+        while True:
+            _res = os.system("ping -c 1 www.baidu.com")
+            if _res == 1:
+                send_email.start()
 
 #/*****************时间线程*****************/
 def time_thread():
