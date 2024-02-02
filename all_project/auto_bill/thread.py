@@ -10,6 +10,7 @@ import time
 import threading
 
 import create
+import water
 import send_email
 from bill_class import DB
 from bill_class import Cmd
@@ -18,36 +19,52 @@ from bill_class import Email
 from bill_class import Check_Time
 
 
-# #/*****************检查线程*****************/
-def check_thread():
+def edit_config():
+    Email.m_bill_status     = False
+    Email.m_old_water       = Email.m_now_water
+    Email.m_old_electricity = Email.m_now_electricity
+
+    if Email.m_now_electricity < Email.m_min_tip:    Email.m_bill_type   = True
+    if Email.m_now_water       < Email.m_min_tip:    Email.m_bill_type   = False
+
+# #/*****************检查费用余额*****************/
+def check_balance():
     while True:
         _res = os.system("ping -c 1 www.baidu.com")
-        if _res == 1:
-            break
+        if _res == 0:   break
         time.sleep(60)
-        
+
 # #获取账单低于10元发送email
-    Email.balance_water = send_email.get_balanc(Email.m_water)
-    Email.balance_electricity = send_email.get_balanc(Email.m_electricity)
-    if Email.balance_electricity< Email.minimum_amount or Email.balance_water < Email.minimum_amount:
+# 修改一下，只有一个url也可以
+    water.get_balanc()
+    if Email.m_now_water == None or Email.m_now_electricity == None:    return
+
+    Email.m_bill_status = False
+    Email.m_bill_type   = False
+    water.send_email()
+    exit()
+
+    if Email.m_now_electricity< Email.m_min_tip or Email.m_now_water < Email.m_min_tip:
+        edit_config()
+
         while True:
             _res = os.system("ping -c 1 www.baidu.com")
-            if _res == 1:
-                send_email.start()
+            if _res == 0:
+                water.send_email()
+                return
+            else:   time.sleep(60)
 
 #/*****************时间线程*****************/
-def time_thread():
-    # run_thread()
+def time_thread(_temp):
+    check_balance()
 
     while True:
-        _now_DateTime = datetime.now()
-        _nowTime = _now_DateTime.hour()
-        if  _nowTime + Check_Time.m_time_interval < Check_Time.m_morning or \
-            _nowTime + Check_Time.m_time_interval < Check_Time.m_night:
-            time.sleep(7200)
-
-        if _nowTime == Check_Time.m_morning or _nowTime == Check_Time.m_night:
-            _check.start()
+        i_now_hour = datetime.now().hour
+        #判断是否是白天
+        if  i_now_hour > Check_Time.m_morning or i_now_hour < Check_Time.m_night:   time.sleep(7200)
+        else:
+            check_balance()
+            time.sleep(60 * 30)
 
 #/*****************交互线程*****************/
 def check_email(_table, _email):
@@ -61,9 +78,8 @@ def result(_table, _email):
     DB.m_db.commit()
     _cmd = "SELECT *FROM %s WHERE %s = '%s';" %(_table, DB.type_email, _email)
     _res = DB._db.execute(_cmd)
-    
-    for _val in _res:
-        print("ID = ", _val[0], " email = ", _val[1], " name = ", _val[2])
+
+    print(list(chain.from_iterable(list(_res))))
 
 #0 为普通用户， 1 为管理员用户
 def add_user(_list, _is_special):
@@ -78,7 +94,9 @@ def add_user(_list, _is_special):
         result(DB.table_user, _list[1])
     else:
         _result = DB._db.execute(f"SELECT *FROM {DB.table_admin};")
-        if bool(_result):
+        _result = DB._db.execute(f"SELECT *FROM {DB.table_admin};")
+        _res = list(chain.from_iterable(list(_result)))
+        if bool(_res):
             print("admin用户已存在, 请使用eadmin命令来修改admin用户")
             return
         else:
@@ -103,7 +121,7 @@ def setnow(_list):
     print(f"now = {_res[Index._ID]} 设置成功")
 
 def seturl(_list):
-    if not (_list[1] == "water" and _list[1] == "electricity"):
+    if not (_list[1] == "water" or _list[1] == "electricity"):
         print("name 错误 水费为:water 电费为:electricity")
         return
     DB._db.execute(f"UPDATE {DB.table_url} SET {DB.type_url} = '{_list[2]}' WHERE {DB.type_name} = '{_list[1]}';")
@@ -280,9 +298,6 @@ def execute_cmd(_dic, _list):
 
 
 def reply_thread(_temp):
-    create.create_db()
-
-    DB.init()
     # _cmd        = []
     _case_list  = []
     _dic        = {}
@@ -297,6 +312,10 @@ def reply_thread(_temp):
         execute_cmd(_dic, _case_list)
 
 if __name__ == '__main__':
+    th_index = 0
+    create.create_db()
+    DB.init()
+
     if len(sys.argv) > 2:
         print("format error ")
         sys.exit()
@@ -304,12 +323,12 @@ if __name__ == '__main__':
         if not sys.argv[1] == "back":
             print("parameter error 请输入 back")
             sys.exit()
-        _reply = threading.Thread(target = reply_thread, args = (1,))
+        th_index += 1
+        _reply = threading.Thread(target = reply_thread, args = (th_index,))
         _reply.start()
         _reply.join()
     else:
-        i = 2
-        _time = threading.Thread(target = time_thread, args = (i,), daemon=True)
+        th_index += 1
+        _time = threading.Thread(target = time_thread, args = (th_index,))
         _time.start()
-        i += 1
-        _check = threading.Thread(target = check_thread, args = (i,))
+        _time.join()
