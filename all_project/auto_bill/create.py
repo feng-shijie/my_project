@@ -16,12 +16,9 @@ def create_db(change = 0):
     if change == 0 and os.path.exists(_dir):
         # print("user.db Lib to exist!")
         return
-    else:   print("create ./db/user.db!")
 
     m_db = sqlite3.connect(_dir)
     _db = m_db.cursor()
-    _db.execute("create table now(email);")
-    _db.execute("create table url(name,url);")
     _db.execute("create table email_user(id INTEGER PRIMARY KEY,email,name);")
     _db.execute('''
                 CREATE TRIGGER auto_sort AFTER DELETE ON email_user
@@ -30,15 +27,15 @@ def create_db(change = 0):
                 END;''')
     _db.execute("create table help(id INTEGER PRIMARY KEY,cmd);")
     _db.execute("create table admin(email,name,server,password);")
-
-    _db.execute(f"INSERT INTO {DB.table_admin}({DB.type_server}) VALUES ('smtp.tom.com');")
-    _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('water' ,'http://wx.tqdianbiao.com/Client/dc2edm30010040002526');")
-    _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('electricity', 'http://wx.tqdianbiao.com/Client/27f69m211003334646');")
+    _db.execute("create table now(id);")
+    _db.execute("create table url(name,url);")
+    _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}) VALUES ('warter');")
+    _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}) VALUES ('electricity');")
 
     #重新导入帮助语句
-    # _result = _db.execute("SELECT *FROM help")
-    # if bool(_result):
-    #     _db.execute("DELETE FROM help;")
+    _result = _db.execute("SELECT *FROM help")
+    if bool(_result):
+        _db.execute("DELETE FROM help;")
 
     _db.execute("INSERT INTO help(cmd) VALUES('add|email+name|添加用户');")
     _db.execute("INSERT INTO help(cmd) VALUES('admin|email+name+smtp_server+password|添加管理员<管理员只能存在一位>');")

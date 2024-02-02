@@ -26,7 +26,7 @@ def istype(_val):
 #/**********************费用余额*********************/
 #获取水费电费余额
 #默认为获取电费, 0为获取水费
-def get_balanc(url, ele_water = True):
+def get_balanc(url, ele_water = 1):
     #获取html
     res = requests.get(url)
     res.encoding = 'utf_8'
