@@ -26,42 +26,36 @@ class DB:
 
 class Email:
     istype          = None      #是水费还是电费
-    water           = False
-    electricity     = True
+    m_bill_type     = None      #true:电    false:水
+    m_bill_status   = None      #true:充值成功  false:提示充值
 
-    minimum_amount  = 10
-    #admin
-    smtp_server     = ""
-    smtp_port       = 25
-    sender_email    = ""
-    sender_password = ""
-
-    #所有收件人
-    now             = None  #当前要通知的缴费人员的ID
-    receiver_email  = []
+    m_min_tip       = 10        #最低余额提示
+    m_smtp_port     = 25        #25为不加密， 加密465 有问题无法登录
 
     #info
-    now_email        = None
     subject          = "!!!账单!!!"
     body             = "请及时缴费"
-    water_text       = f"水费不足 {minimum_amount}元"
-    electricity_text = f"电费不足 {minimum_amount}元"
+    water_text       = f"水费不足 {m_min_tip}元"
+    electricity_text = f"电费不足 {m_min_tip}元"
 
     subject_success     = "!!!恭喜!!!"
     body_success        = "余额为：： "
     water_success_text       = " 水费充值成功"
     electricity_success_text = " 电费充值成功"
 
-    balance_water           = None
-    balance_electricity     = None
+    #电费，水费，金额
+    m_now_water           = None
+    m_now_electricity     = None
+
+    m_old_water           = None
+    m_old_electricity     = None
 
 class Check_Network:
     NetWork_start = True
 
 class Check_Time:
-    m_morning       = 10
-    m_night         = 22
-    m_time_interval = 3
+    m_morning       = 9     #白天
+    m_night         = 18    #晚上
 
 class Cmd:
     _ADD         = 0
