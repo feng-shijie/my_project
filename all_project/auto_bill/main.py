@@ -9,14 +9,13 @@ import sys
 import time
 import threading
 
+import bill
 import create
-import water
-import send_email
+
 from bill_class import DB
 from bill_class import Cmd
 from bill_class import Index
 from bill_class import Email
-from bill_class import Check_Time
 
 
 def edit_config():
@@ -36,12 +35,12 @@ def check_balance():
 
 # #获取账单低于10元发送email
 # 修改一下，只有一个url也可以
-    water.get_balanc()
+    bill.get_balanc()
     if Email.m_now_water == None or Email.m_now_electricity == None:    return
 
     Email.m_bill_status = False
     Email.m_bill_type   = False
-    water.send_email()
+    bill.send_email()
     exit()
 
     if Email.m_now_electricity< Email.m_min_tip or Email.m_now_water < Email.m_min_tip:
@@ -50,7 +49,7 @@ def check_balance():
         while True:
             _res = os.system("ping -c 1 www.baidu.com")
             if _res == 0:
-                water.send_email()
+                bill.send_email()
                 return
             else:   time.sleep(60)
 
@@ -61,7 +60,7 @@ def time_thread(_temp):
     while True:
         i_now_hour = datetime.now().hour
         #判断是否是白天
-        if  i_now_hour > Check_Time.m_morning or i_now_hour < Check_Time.m_night:   time.sleep(7200)
+        if  i_now_hour > Email.m_morning or i_now_hour < Email.m_night:   time.sleep(7200)
         else:
             check_balance()
             time.sleep(60 * 30)

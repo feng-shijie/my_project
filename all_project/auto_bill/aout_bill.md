@@ -26,13 +26,8 @@ url         地址
 
 ### create.sh   <以弃用>
 数据保存到文件
-### send_email.py   <以弃用>
-从文件中获取数据 发送email
 
-### start.py
-开始main
-
-### thread.py
+### main.py
 1. back线程
    用户交互线程，
 2. time线程
@@ -41,7 +36,7 @@ url         地址
    工作日 9-18 每隔3小时检查余额
    非工作日     每隔1小时检查余额
 
-### water.py
+### email.py
     从数据库中获取数据， 发送email
     email发送情况
     余额不足发送至当前缴费人员

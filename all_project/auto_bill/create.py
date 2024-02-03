@@ -6,16 +6,14 @@ import os
 import sys
 from bill_class import DB
 
-def create_db(change = 0):
+def create_db():
     _dir = sys.path[0] + "/db"
     if not os.path.isdir(_dir):
         _cmd = "mkdir " + _dir
         os.system(_cmd)
 
     _dir = _dir + "/user.db"
-    if change == 0 and os.path.exists(_dir):
-        # print("user.db Lib to exist!")
-        return
+    if os.path.exists(_dir):    return
     else:   print("create ./db/user.db!")
 
     m_db = sqlite3.connect(_dir)
@@ -37,11 +35,6 @@ def create_db(change = 0):
     _db.execute(f"INSERT INTO {DB.table_admin}({DB.type_server}) VALUES ('smtp.tom.com');")
     _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('water' ,'http://wx.tqdianbiao.com/Client/dc2edm30010040002526');")
     _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('electricity', 'http://wx.tqdianbiao.com/Client/27f69m211003334646');")
-
-    #重新导入帮助语句
-    # _result = _db.execute("SELECT *FROM help")
-    # if bool(_result):
-    #     _db.execute("DELETE FROM help;")
 
     _db.execute("INSERT INTO help VALUES('add', 'email+name', '添加用户');")
     _db.execute("INSERT INTO help VALUES('admin', 'email+name+smtp_server+password', '添加管理员<管理员只能存在一位>');")
