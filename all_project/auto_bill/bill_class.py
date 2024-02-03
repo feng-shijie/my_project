@@ -25,7 +25,10 @@ class DB:
         DB._db      = DB.m_db.cursor()
 
 class Email:
-    istype          = None      #是水费还是电费
+    NetWork_start   = True      #网络状态
+    m_morning       = 9         #白天
+    m_night         = 18        #晚上
+
     m_bill_type     = None      #true:电    false:水
     m_bill_status   = None      #true:充值成功  false:提示充值
 
@@ -38,8 +41,8 @@ class Email:
     water_text       = f"水费不足 {m_min_tip}元"
     electricity_text = f"电费不足 {m_min_tip}元"
 
-    subject_success     = "!!!恭喜!!!"
-    body_success        = "余额为：： "
+    subject_success          = "!!!恭喜!!!"
+    body_success             = "余额为：： "
     water_success_text       = " 水费充值成功"
     electricity_success_text = " 电费充值成功"
 
@@ -49,13 +52,6 @@ class Email:
 
     m_old_water           = None
     m_old_electricity     = None
-
-class Check_Network:
-    NetWork_start = True
-
-class Check_Time:
-    m_morning       = 9     #白天
-    m_night         = 18    #晚上
 
 class Cmd:
     _ADD         = 0

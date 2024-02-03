@@ -30,12 +30,6 @@ IS_PING = False
 # #水表url
 # water_url 		= "http://wx.tqdianbiao.com/Client/dc2edm30010040002526"
 
-
-m_user	= None
-
-#月度总结 列表
-m_count_month	= 0
-
 #充值的水费和电费
 m_ele_balanc	= 0
 m_water_balanc	= 0
