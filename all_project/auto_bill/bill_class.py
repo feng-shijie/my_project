@@ -73,8 +73,7 @@ class Cmd:
     _HELP        = 12
 
 class Index:
-    _ID          = 0
-    _EMAIL       = 1
-    _NAME        = 2
-    _SERVER      = 3
-    _PASSWORD    = 4
+    _EMAIL       = 0
+    _NAME        = 1
+    _SERVER      = 2
+    _PASSWORD    = 3

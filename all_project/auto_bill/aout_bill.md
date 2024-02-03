@@ -3,6 +3,14 @@
 ## 模块安装
 pip3 install beautifulsoup4
 
+## 初始化
+python3 thred.py back   进入交互线程
+添加admin用户<发送者>
+添加普通用户<接收者>
+添加当前缴费人员
+添加水费，电费的url链接
+全部添加完毕后退出
+后台运行    nohup python3 thread.py &
 
 ## 文件详解
 ### bill_class.py
