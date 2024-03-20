@@ -48,6 +48,7 @@ def add_user(_list, _is_special):
                 print("添加admin用户到用户列表")
                 add_user(_list, False)
 
+#判断当前用户是否为用户成员，如不是请先添加
 def setnow(_list):
     _result = DB._db.execute(f"SELECT * FROM {DB.table_user} WHERE {DB.type_email} = '{_list[1]}';")
     _res    = list(chain.from_iterable(list(_result)))
@@ -56,9 +57,9 @@ def setnow(_list):
         print("请先在用户列表中添加用户")
         return
 
-    DB._db.execute(f"INSERT INTO {DB.table_now} VALUES('{_res[Index._EMAIL]}');")
+    DB._db.execute(f"INSERT INTO {DB.table_now} VALUES('{_res[Index._EMAIL]}', '{_res[Index._NAME]}');")
     DB.m_db.commit()
-    print(f"now = {_res[Index._EMAIL]} 设置成功")
+    print(f"now = {_res} 设置成功")
 
 def seturl(_list):
     if not (_list[1] == "water" or _list[1] == "electricity"):
@@ -69,29 +70,53 @@ def seturl(_list):
     print(f"name = {_list[1]} url = {_list[2]} 修改成功")
 
 
+#判断当前删除的用户是否为缴费用户，如果是询问是否删除
 def remove_user(_list):
-    if not check_email(DB.table_user,_list[1]):
-        print("用户不存在, 请使用add命令来添加用户")
+    if not check_email(DB.table_user,_list[1]):     print("用户不存在, 请使用add命令来添加用户")
     else:
+        sql_res = DB._db.execute(f"SELECT * FROM {DB.table_now} WHERE {DB.type_email} = '{_list[1]}';")
+        now_user = list(sql_res)
+        if len(now_user):
+            print("要删除的用户为缴费用户，如删除将自动轮询到下一位用户")
+            while True:
+                in_res = input("删除请输入y, 不删除请输入n:")
+                in_res = in_res.strip()
+                in_res = in_res.lower()
+                if in_res == 'y':
+                    sql_res = DB._db.execute(f"SELECT * FROM {DB.table_user}")
+                    l_user = list(sql_res)
+                    idx = 0
+                    for user_idx in range(0, len(l_user)):
+                        if now_user[0][Index._EMAIL] == l_user[user_idx][Index._EMAIL]: idx = user_idx + 1
+                    if idx >= len(l_user):  now_user = l_user[0]
+                    else:                   now_user = l_user[idx]
+                    DB._db.execute(f"DELETE FROM {DB.table_now};")
+                    DB._db.execute(f"INSERT INTO {DB.table_now} VALUES('{now_user[Index._EMAIL]}', '{now_user[Index._NAME]}');")
+                    print(f"now user to update: {now_user}")
+                    break
+                elif in_res == 'n':    return
+                else:   print("输入有误")
+
         result(DB.table_user, _list[1])
         _cmd = f"DELETE FROM {DB.table_user} WHERE {DB.type_email} = '{_list[1]}';"         
         DB._db.execute(_cmd)
         DB.m_db.commit()
-        if check_email(DB.table_user,_list[1]):
-            print("DELETE error")
-        else:
-            print("用户已删除")
+        if check_email(DB.table_user,_list[1]): print("DELETE error")
+        else:                                   print("用户已删除")
 
 #false为普通用户，true为admin用户
+#判断当前修改的用户是否为缴费用户，如果是更新now表
 def edit_user(_list, _is_special):
     if not _is_special:
         if not check_email(DB.table_user,_list[1]):
             print("用户不存在, 请使用add命令来添加用户")
             return
-        _cmd = "UPDATE %s SET %s = '%s' AND %s = '%s' WHERE %s = '%s' AND %s = '%s';" \
-        %(DB.table_user, DB.type_email, _list[1], DB.type_name, _list[2], DB.type_email, _list[1], DB.type_name, _list[2])
-        
+        _cmd = "UPDATE %s SET %s = '%s', %s = '%s' WHERE %s = '%s';" \
+        %(DB.table_user, DB.type_email, _list[1], DB.type_name, _list[2], DB.type_email, _list[1])
         DB._db.execute(_cmd)
+        res = DB._db.execute(f"SELECT * FROM {DB.table_now} WHERE {DB.type_email} = '{_list[1]}';")
+        if len(list(res)):
+            DB._db.execute(f"UPDATE {DB.table_now} SET {DB.type_email} = '{_list[1]}', {DB.type_name} = '{_list[2]}';")
         result(DB.table_user, _list[1])
     else:
         if not check_email(DB.table_user,_list[1]):
@@ -102,6 +127,7 @@ def edit_user(_list, _is_special):
         
         DB._db.execute(_cmd)
         result(DB.table_admin, _list[1])
+    DB.m_db.commit()
     print("用户已修改")
 
 
@@ -116,8 +142,9 @@ def getall_user():
     _cmd = f"SELECT * FROM {DB.table_user};"
     _result = DB._db.execute(_cmd)
 
-    if len(list(_result)):
-        for _val in _result:
+    l_user = list(_result)
+    if len(l_user):
+        for _val in l_user:
             print(" email = ", _val[Index._EMAIL], " name = ", _val[Index._NAME])
     else:   print("没有用户, 请使用add命令添加用户")
 
@@ -172,10 +199,10 @@ def execute_cmd(_dic, _list):
 
     if   _val == Cmd._ADD:      add_user(_list, False)
     elif _val == Cmd._ADMIN:    add_user(_list, True )
-    elif _val == Cmd._SETNOW:   setnow(_list)               #改为修改当前用户
+    elif _val == Cmd._SETNOW:   setnow(_list)
     elif _val == Cmd._SETURL:   seturl(_list)
-    elif _val == Cmd._REMOVE:   remove_user(_list)          #判断删除用户是否为当前用户
-    elif _val == Cmd._EDIT:     edit_user(_list, False)     #判断修改用户是否为当前用户
+    elif _val == Cmd._REMOVE:   remove_user(_list)
+    elif _val == Cmd._EDIT:     edit_user(_list, False)
     elif _val == Cmd._EADMIN:   edit_user(_list, True )
     elif _val == Cmd._SELECT:   select_user(_list)
     elif _val == Cmd._GETALL:   getall_user()

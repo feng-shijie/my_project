@@ -51,7 +51,8 @@ def get_balance():
 #/**********************email*********************/
 #充值成功通知所有人, 每次只能通知一个人NOW不能在这里++
 def email_all():
-	_bill =  "充值用户: " + str(Email.m_now_user[Index._NAME])
+	_bill =  "充值用户: "		+ str(Email.m_now_user[Index._NAME] )
+	_bill += "充值用户email: "  + str(Email.m_now_user[Index._EMAIL])
 	_bill += "\n充值前电费余额为: " + str(Email.m_balance_electricity)
 	_bill += "\n充值前水费余额为: " + str(Email.m_balance_water		 )
 	_bill += "\n充值后电费余额为: " + str(Email.m_now_electricity	 )

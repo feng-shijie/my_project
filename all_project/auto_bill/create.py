@@ -38,7 +38,7 @@ def create_db():
 
     _db.execute("INSERT INTO help VALUES('add', 'email+name', '添加用户');")
     _db.execute("INSERT INTO help VALUES('admin', 'email+name+smtp_server+password', '添加管理员<管理员只能存在一位>');")
-    _db.execute("INSERT INTO help VALUES('editnow', 'email+name', '修改当前缴费者');")
+    _db.execute("INSERT INTO help VALUES('setnow', 'email+name', '修改当前缴费者');")
     _db.execute("INSERT INTO help VALUES('seturl', 'name+url', '设置water/electricity url');")
     _db.execute("INSERT INTO help VALUES('edit', 'email+name', '修改用户');")
     _db.execute("INSERT INTO help VALUES('eadmin', 'email+name+smtp_server+password', '修改管理员');")
