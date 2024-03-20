@@ -51,12 +51,21 @@ def get_balance():
 #/**********************email*********************/
 #充值成功通知所有人, 每次只能通知一个人NOW不能在这里++
 def email_all():
-	_bill =  "充值用户: "		+ str(Email.m_now_user[Index._NAME] )
-	_bill += "充值用户email: "  + str(Email.m_now_user[Index._EMAIL])
-	_bill += "\n充值前电费余额为: " + str(Email.m_balance_electricity)
+	_bill = "充值前电费余额为: "	+ str(Email.m_balance_electricity)
 	_bill += "\n充值前水费余额为: " + str(Email.m_balance_water		 )
 	_bill += "\n充值后电费余额为: " + str(Email.m_now_electricity	 )
 	_bill += "\n充值后水费余额为: " + str(Email.m_now_water			 )
+
+	sql_res = DB._db.execute(f"SELECT * FROM {DB.table_user}")
+	l_user  = list(sql_res)
+	#用于防止出错的情况，可自行核对
+	if len(l_user):
+		_bill += "\n所有用户:"
+		mat = "{0:<5}\t{1:<5}\t{2:<5}\t{3:<5}"
+		for user in l_user:	_bill += mat.format("\n用户: ", user[Index._NAME], "用户email: ", user[Index._EMAIL])
+		mat = "{0:<3}\t{1:<3}"
+	_bill += mat.format("\n充值用户: ", Email.m_now_user[Index._NAME])
+	_bill += mat.format("\n充值用户email: ", Email.m_now_user[Index._EMAIL])
 	return _bill
 
 #提醒NOW充值费用
