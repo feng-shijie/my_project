@@ -25,33 +25,19 @@ class DB:
         DB._db      = DB.m_db.cursor()
 
 class Email:
-    NetWork_start   = True      #网络状态
-    m_morning       = 9         #白天
-    m_night         = 18        #晚上
-
-    m_bill_type     = None      #true:电    false:水
+    m_now_user      = []        #当前用户
     m_bill_status   = None      #true:充值成功  false:提示充值
 
+    m_timeout       = 60        #超时时间
     m_min_tip       = 10        #最低余额提示
     m_smtp_port     = 25        #25为不加密， 加密465 有问题无法登录
-
-    #info
-    subject          = "!!!账单!!!"
-    body             = "请及时缴费"
-    water_text       = f"水费不足 {m_min_tip}元"
-    electricity_text = f"电费不足 {m_min_tip}元"
-
-    subject_success          = "!!!恭喜!!!"
-    body_success             = "余额为：： "
-    water_success_text       = " 水费充值成功"
-    electricity_success_text = " 电费充值成功"
 
     #电费，水费，金额
     m_now_water           = None
     m_now_electricity     = None
 
-    m_old_water           = None
-    m_old_electricity     = None
+    m_balance_water           = None
+    m_balance_electricity     = None
 
 class Cmd:
     _ADD         = 0
