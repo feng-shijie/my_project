@@ -19,6 +19,7 @@ def create_db():
     m_db = sqlite3.connect(_dir)
     _db = m_db.cursor()
     _db.execute("create table now(email,name);")
+    _db.execute("create table bill(name,balance);")
     _db.execute("create table url(name,url);")
     _db.execute("create table email_user(email,name);")
     _db.execute("create table help(cmd, param, explain);")
@@ -33,6 +34,8 @@ def create_db():
     # _db.execute("create table help(id INTEGER PRIMARY KEY,cmd);")
 
     _db.execute(f"INSERT INTO {DB.table_admin}({DB.type_server}) VALUES ('smtp.tom.com');")
+    _db.execute(f"INSERT INTO {DB.table_bill}({DB.type_name}) VALUES ('water');")
+    _db.execute(f"INSERT INTO {DB.table_bill}({DB.type_name}) VALUES ('electricity');")
     _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('water' ,'http://wx.tqdianbiao.com/Client/dc2edm30010040002526');")
     _db.execute(f"INSERT INTO {DB.table_url}({DB.type_name}, {DB.type_url}) VALUES ('electricity', 'http://wx.tqdianbiao.com/Client/27f69m211003334646');")
 

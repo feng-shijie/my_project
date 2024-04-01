@@ -13,6 +13,7 @@ class DB:
     table_help      = "help"
     table_url       = "url"
     table_now       = "now"
+    table_bill      = "bill"
 
     type_id         = "id"
     type_url        = "url"
@@ -20,6 +21,7 @@ class DB:
     type_name       = "name"
     type_server     = "server"
     type_password   = "password"
+    type_balance    = "balance"
     def init():
         DB.m_db     = sqlite3.connect(f"{sys.path[0]}/db/user.db", check_same_thread=False)
         DB._db      = DB.m_db.cursor()

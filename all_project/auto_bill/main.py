@@ -70,6 +70,9 @@ def update_now_user():
 def add_now_user():
     sql_res = DB._db.execute(f"SELECT * FROM {DB.table_user}")
     l_user = list(sql_res)
+    if len(l_user) == 0:
+        print("没有用户, 无法添加当前缴费用户。请使用add命令添加用户")
+        exit()
     Email.m_now_user = l_user[0]
     DB._db.execute(f"INSERT INTO {DB.table_now} VALUES('{Email.m_now_user[Index._EMAIL]}','{Email.m_now_user[Index._NAME]}');")
     DB.m_db.commit()
