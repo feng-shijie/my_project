@@ -43,10 +43,14 @@ def get_balance():
 		if IS_PING:	print(balanc.group())
 
 		if str(balanc).find(':')  > 0 or str(balanc).find('.') >0:
-			#只要整数
+			#只要整数		可能出现错误  https://stackoverflow.com/questions/1841565/valueerror-invalid-literal-for-int-with-base-10
 			i_balance = int(str(balanc)[str(balanc).find(':') + 1 : str(balanc).rfind('.')])
 			if	 str(curr_info[0]) == 'water':			Email.m_now_water 		= i_balance
 			elif str(curr_info[0]) == 'electricity':	Email.m_now_electricity = i_balance
+
+	DB._db.execute(f"UPDATE {DB.table_bill} SET {DB.type_balance} = '{Email.m_now_water}' WHERE {DB.type_name} = 'water';")
+	DB._db.execute(f"UPDATE {DB.table_bill} SET {DB.type_balance} = '{Email.m_now_electricity}' WHERE {DB.type_name} = 'electricity';")
+	DB.m_db.commit()
 
 #/**********************email*********************/
 #充值成功通知所有人, 每次只能通知一个人NOW不能在这里++
